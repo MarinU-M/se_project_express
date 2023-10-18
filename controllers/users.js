@@ -2,6 +2,7 @@ const Users = require("../models/users");
 
 const getUsers = (req, res) => {
   Users.find({})
+    .orFail()
     .then((users) => res.status(200).send(users))
     .catch((evt) =>
       res.status(500).send({ message: "Error from getUsers" }, evt),
@@ -27,6 +28,7 @@ const createUser = (req, res) => {
   const { name, avatar } = req.body;
 
   Users.create({ name, avatar })
+    .orFail()
     .then((user) => {
       console.log(user);
       res.send({ data: user });

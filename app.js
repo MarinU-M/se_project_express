@@ -15,6 +15,13 @@ const routes = require("./routes");
 app.use(express.json());
 app.use(routes);
 
+app.use((req, res, next) => {
+  req.user = {
+    _id: "652f069dfdda4b8ee1510294", // paste the _id of the test user created in the previous step
+  };
+  next();
+});
+
 app.listen(PORT, () => {
   console.log(PORT);
   console.log(BASE_PATH);

@@ -1,13 +1,12 @@
 const ClothingItems = require("../models/clothingItems");
 
 const createItem = (req, res) => {
-  console.log(req);
-  console.log(res);
-  console.log(req.body);
+  console.log(req.user._id);
 
   const { name, weather, imageUrl, owner, likes, createdAt } = req.body;
 
   ClothingItems.create({ name, weather, imageUrl, owner, likes, createdAt })
+    .orFail()
     .then((item) => {
       console.log(item);
       res.send({ data: item });
@@ -19,23 +18,12 @@ const createItem = (req, res) => {
 
 const getItems = (req, res) => {
   ClothingItems.find({})
+    .orFail()
     .then((items) => res.status(200).send(items))
     .catch((evt) =>
       res.status(500).send({ message: "Error from getItems" }, evt),
     );
 };
-
-// const updateItem = (req, res) => {
-//   const { itemId } = req.params;
-//   const { imageUrl } = req.body;
-
-//   ClothingItems.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-//     .orFail()
-//     .then((item) => res.status(200).send({ data: item }))
-//     .catch((evt) =>
-//       res.status(500).send({ message: "Error from updateItem" }, evt),
-//     );
-// };
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
@@ -47,4 +35,41 @@ const deleteItem = (req, res) => {
       res.status(500).send({ message: "Error from deleteItem" }, evt),
     );
 };
-module.exports = { createItem, getItems, deleteItem };
+
+const addLikes = (req, res) => {
+  const { userId } = req.user._id;
+  const { itemId } = req.params;
+
+  ClothingItems.findByIdAndUpdate(
+    itemId,
+    {
+      $addToSet: { likes: userId },
+    },
+    { new: true },
+  )
+    .orFail()
+    .then((item) => res.status(200).send({ data: item }))
+    .catch((evt) =>
+      res.status(500).send({ message: "Error from updateItem" }, evt),
+    );
+};
+
+const removeLikes = (req, res) => {
+  const { userId } = req.user._id;
+  const { itemId } = req.params;
+
+  ClothingItems.findByIdAndUpdate(
+    itemId,
+    {
+      $pull: { likes: userId },
+    },
+    { new: true },
+  )
+    .orFail()
+    .then((item) => res.status(200).send({ data: item }))
+    .catch((evt) =>
+      res.status(500).send({ message: "Error from updateItem" }, evt),
+    );
+};
+
+module.exports = { createItem, getItems, deleteItem, addLikes, removeLikes };
