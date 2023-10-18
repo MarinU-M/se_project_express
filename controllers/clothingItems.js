@@ -1,4 +1,5 @@
 const ClothingItems = require("../models/clothingItems");
+const { errorHandler } = require("../utils/error");
 
 const createItem = (req, res) => {
   console.log(req.user._id);
@@ -11,18 +12,14 @@ const createItem = (req, res) => {
       console.log(item);
       res.send({ data: item });
     })
-    .catch((evt) => {
-      res.status(500).send({ message: "Error from createItem", evt });
-    });
+    .catch((err) => errorHandler(err));
 };
 
 const getItems = (req, res) => {
   ClothingItems.find({})
     .orFail()
     .then((items) => res.status(200).send(items))
-    .catch((evt) =>
-      res.status(500).send({ message: "Error from getItems" }, evt),
-    );
+    .catch((err) => errorHandler(err));
 };
 
 const deleteItem = (req, res) => {
@@ -31,9 +28,7 @@ const deleteItem = (req, res) => {
   ClothingItems.findByIdAndDelete(itemId)
     .orFail()
     .then((item) => res.status(204).send({ data: item }))
-    .catch((evt) =>
-      res.status(500).send({ message: "Error from deleteItem" }, evt),
-    );
+    .catch((err) => errorHandler(err));
 };
 
 const addLikes = (req, res) => {
@@ -49,9 +44,7 @@ const addLikes = (req, res) => {
   )
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
-    .catch((evt) =>
-      res.status(500).send({ message: "Error from updateItem" }, evt),
-    );
+    .catch((err) => errorHandler(err));
 };
 
 const removeLikes = (req, res) => {
@@ -67,9 +60,7 @@ const removeLikes = (req, res) => {
   )
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
-    .catch((evt) =>
-      res.status(500).send({ message: "Error from updateItem" }, evt),
-    );
+    .catch((err) => errorHandler(err));
 };
 
 module.exports = { createItem, getItems, deleteItem, addLikes, removeLikes };
