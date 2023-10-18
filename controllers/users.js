@@ -10,7 +10,7 @@ const getUsers = (req, res) => {
 };
 
 const getAUser = (req, res) => {
-  const { userId } = req.params;
+  const { userId } = req.user._id;
 
   Users.findById(userId)
     .orFail()
@@ -26,6 +26,7 @@ const createUser = (req, res) => {
   console.log(req.body);
 
   const { name, avatar } = req.body;
+  const { userId } = req.user._id;
 
   Users.create({ name, avatar })
     .orFail()

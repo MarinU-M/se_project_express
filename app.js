@@ -5,13 +5,15 @@ const { PORT = 3001, BASE_PATH } = process.env;
 const app = express();
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db", (r) => {
-  console.log("Connected to DB"),
+  (r) => {
+    console.log("Connected to DB", r);
+  },
     (e) => {
-      console.log("Error in DB"), e;
+      console.log("Error in DB", e);
     };
 });
 
-const routes = require("./routes");
+const routes = require("./routes/index");
 app.use(express.json());
 app.use(routes);
 
