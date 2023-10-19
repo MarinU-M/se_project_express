@@ -16,14 +16,13 @@ mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db", (r) => {
 const routes = require("./routes/index");
 
 app.use(express.json());
-
-app.use(routes);
 app.use((req, res, next) => {
   req.user = {
-    _id: "652f069dfdda4b8ee1510294", // paste the _id of the test user created in the previous step
+    _id: "6530430b72b4e6caeec69301", // paste the _id of the test user created in the previous step
   };
   next();
 });
+app.use(routes);
 
 app.listen(PORT, () => {
   console.log(PORT);

@@ -3,7 +3,7 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   DEFAULT,
-  errorHandler,
+  // errorHandler,
 } = require("../utils/error");
 
 const createItem = (req, res, next) => {
@@ -24,9 +24,10 @@ const createItem = (req, res, next) => {
     // .orFail()
     .then((item) => {
       console.log(item);
-      res.send({ data: item });
+      res.status(201).send({ data: item });
     })
     .catch((err) => {
+      console.error(err);
       if (err.status === BAD_REQUEST) {
         return res
           .status(BAD_REQUEST)
@@ -48,7 +49,22 @@ const getItems = (req, res) => {
   ClothingItems.find({})
     .orFail()
     .then((items) => res.status(200).send(items))
-    .catch((err) => errorHandler(err));
+    .catch((err) => {
+      console.error(err);
+      if (err.status === BAD_REQUEST) {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid request", err });
+      }
+      if (err.status === NOT_FOUND) {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Requested info is not found", err });
+      }
+      if (err.status === DEFAULT) {
+        return res.status(DEFAULT).send({ message: "Server error", err });
+      }
+    });
 };
 
 const deleteItem = (req, res) => {
@@ -57,7 +73,22 @@ const deleteItem = (req, res) => {
   ClothingItems.findByIdAndDelete(itemId)
     .orFail()
     .then((item) => res.status(204).send({ data: item }))
-    .catch((err) => errorHandler(err));
+    .catch((err) => {
+      console.error(err);
+      if (err.status === BAD_REQUEST) {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid request", err });
+      }
+      if (err.status === NOT_FOUND) {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Requested info is not found", err });
+      }
+      if (err.status === DEFAULT) {
+        return res.status(DEFAULT).send({ message: "Server error", err });
+      }
+    });
 };
 
 const addLikes = (req, res) => {
@@ -73,7 +104,22 @@ const addLikes = (req, res) => {
   )
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
-    .catch((err) => errorHandler(err));
+    .catch((err) => {
+      console.error(err);
+      if (err.status === BAD_REQUEST) {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid request", err });
+      }
+      if (err.status === NOT_FOUND) {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Requested info is not found", err });
+      }
+      if (err.status === DEFAULT) {
+        return res.status(DEFAULT).send({ message: "Server error", err });
+      }
+    });
 };
 
 const removeLikes = (req, res) => {
@@ -89,7 +135,22 @@ const removeLikes = (req, res) => {
   )
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
-    .catch((err) => errorHandler(err));
+    .catch((err) => {
+      console.error(err);
+      if (err.status === BAD_REQUEST) {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid request", err });
+      }
+      if (err.status === NOT_FOUND) {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Requested info is not found", err });
+      }
+      if (err.status === DEFAULT) {
+        return res.status(DEFAULT).send({ message: "Server error", err });
+      }
+    });
 };
 
 module.exports = { createItem, getItems, deleteItem, addLikes, removeLikes };

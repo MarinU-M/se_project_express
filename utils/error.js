@@ -19,4 +19,4 @@ const errorHandler = (req, res, next) => {
   next();
 };
 
-module.exports = { BAD_REQUEST, NOT_FOUND, DEFAULT, errorHandler };
+module.exports = { BAD_REQUEST, NOT_FOUND, DEFAULT };
