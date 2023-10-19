@@ -70,7 +70,7 @@ const createUser = (req, res, next) => {
     // .orFail()
     .then((user) => {
       console.log(user);
-      res.send({ data: user });
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.status === BAD_REQUEST) {
