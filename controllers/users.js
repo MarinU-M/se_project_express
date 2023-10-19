@@ -14,17 +14,15 @@ const getUsers = (req, res, next) => {
       console.error(err);
       //   errorHandler(err);
       // },
-      if (err.status === BAD_REQUEST) {
+      if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (getUsers)", err });
-      }
-      if (err.status === NOT_FOUND) {
+      } else if (err.name === "NotFound") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (getUsers)", err });
-      }
-      if (err.status === DEFAULT) {
+      } else {
         return res
           .status(DEFAULT)
           .send({ message: "Server error (getUsers)", err });
@@ -44,22 +42,21 @@ const getAUser = (req, res) => {
       console.error(err);
       //   errorHandler(err);
       // },
-      if (err.status === BAD_REQUEST) {
+      if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (getAUser)", err });
-      }
-      if (err.status === NOT_FOUND) {
+      } else if (err.name === "NotFound") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (getAUser)", err });
-      }
-      if (err.status === DEFAULT) {
+      } else {
         return res
           .status(DEFAULT)
           .send({ message: "Server error (getAUser)", err });
       }
     });
+  // next();
 };
 
 const createUser = (req, res, next) => {
@@ -76,23 +73,21 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       console.error(err);
       // errorHandler(err);
-      if (err.name === "ValidatorError") {
+      if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (createUser)", err });
-      }
-      if (err.status === NOT_FOUND) {
+      } else if (err.name === "NotFound") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (createUser)", err });
-      }
-      if (err.status === DEFAULT) {
+      } else {
         return res
           .status(DEFAULT)
           .send({ message: "Server error (createUser)", err });
       }
     });
-  next();
+  // next();
 };
 
 module.exports = { getUsers, getAUser, createUser };
