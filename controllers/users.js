@@ -11,7 +11,9 @@ const getUsers = (req, res, next) => {
     .orFail()
     .then((users) => res.status(200).send(users))
     .catch(
-      (err) => errorHandler(err),
+      (err) => {
+        errorHandler(err);
+      },
       // if (err.status === BAD_REQUEST) {
       //   return res
       //     .status(BAD_REQUEST)
@@ -28,17 +30,20 @@ const getUsers = (req, res, next) => {
       //     .send({ message: "Server error (getUsers)", err });
       // }
     );
-  next();
+  // next();
 };
 
 const getAUser = (req, res) => {
   const { userId } = req.user._id;
+  console.log(userId);
 
   Users.findById(userId)
-    .orFail()
+    // .orFail()
     .then((user) => res.status(204).send({ data: user }))
     .catch(
-      (err) => errorHandler(err),
+      (err) => {
+        errorHandler(err);
+      },
       // if (err.status === BAD_REQUEST) {
       //   return res
       //     .status(BAD_REQUEST)
@@ -73,23 +78,24 @@ const createUser = (req, res, next) => {
       res.status(200).send({ data: user });
     })
     .catch((err) => {
-      if (err.status === BAD_REQUEST) {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid request (createUser)", err });
-      }
-      if (err.status === NOT_FOUND) {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Requested info is not found (createUser)", err });
-      }
-      if (err.status === DEFAULT) {
-        return res
-          .status(DEFAULT)
-          .send({ message: "Server error (createUser)", err });
-      }
+      errorHandler(err);
+      // if (err.status === BAD_REQUEST) {
+      //   return res
+      //     .status(BAD_REQUEST)
+      //     .send({ message: "Invalid request (createUser)", err });
+      // }
+      // if (err.status === NOT_FOUND) {
+      //   return res
+      //     .status(NOT_FOUND)
+      //     .send({ message: "Requested info is not found (createUser)", err });
+      // }
+      // if (err.status === DEFAULT) {
+      //   return res
+      //     .status(DEFAULT)
+      //     .send({ message: "Server error (createUser)", err });
+      // }
     });
-  next();
+  // next();
 };
 
 module.exports = { getUsers, getAUser, createUser };
