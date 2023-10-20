@@ -73,7 +73,7 @@ const deleteItem = (req, res) => {
 
   ClothingItems.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => res.status(204).send({ data: item }))
+    .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
@@ -94,7 +94,7 @@ const deleteItem = (req, res) => {
 
 const addLikes = (req, res) => {
   const userId = req.user._id;
-  const { itemId } = req.params;
+  const itemId = req.params._id;
   console.log(userId);
   console.log(itemId);
 
@@ -105,7 +105,7 @@ const addLikes = (req, res) => {
     },
     { new: true },
   )
-    .orFail()
+    // .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);

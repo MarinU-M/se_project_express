@@ -32,12 +32,12 @@ const getUsers = (req, res, next) => {
 };
 
 const getAUser = (req, res) => {
-  const userId = req.user._id;
+  const userId = req.params.userid;
   console.log(userId);
 
   Users.findById(userId)
-    // .orFail()
-    .then((user) => res.status(204).send({ data: user }))
+    .orFail()
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       console.error(err);
       //   errorHandler(err);
