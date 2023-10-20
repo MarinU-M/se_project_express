@@ -36,13 +36,17 @@ const getAUser = (req, res) => {
   console.log(userId);
 
   Users.findById(userId)
-    .orFail()
+    .orFail(() => {
+      const error = new Error("No record found with that id");
+      error.statusCode = NOT_FOUND;
+      throw error; // Remember to throw an error so .catch handles it instead of .then
+    })
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       console.error(err);
       //   errorHandler(err);
       // },
-      if (err.name === "ValidationError") {
+      if (err.name === "ValidationError" || err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (getAUser)", err });
