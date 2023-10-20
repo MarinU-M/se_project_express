@@ -6,7 +6,7 @@ const {
   // errorHandler,
 } = require("../utils/error");
 
-const getUsers = (req, res, next) => {
+const getUsers = (req, res) => {
   Users.find({})
     .orFail()
     .then((users) => res.status(200).send(users))
@@ -18,29 +18,24 @@ const getUsers = (req, res, next) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (getUsers)", err });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "NotFound") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (getUsers)", err });
-      } else {
-        return res
-          .status(DEFAULT)
-          .send({ message: "Server error (getUsers)", err });
       }
+      return res
+        .status(DEFAULT)
+        .send({ message: "Server error (getUsers)", err });
     });
   // next();
 };
 
 const getAUser = (req, res) => {
-  const userId = req.params.userid;
-  console.log(userId);
+  const { userId } = req.params;
 
   Users.findById(userId)
-    .orFail(() => {
-      const error = new Error("No record found with that id");
-      error.statusCode = NOT_FOUND;
-      throw error; // Remember to throw an error so .catch handles it instead of .then
-    })
+    .orFail()
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       console.error(err);
@@ -50,23 +45,21 @@ const getAUser = (req, res) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (getAUser)", err });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (getAUser)", err });
-      } else {
-        return res
-          .status(DEFAULT)
-          .send({ message: "Server error (getAUser)", err });
       }
+      return res
+        .status(DEFAULT)
+        .send({ message: "Server error (getAUser)", err });
     });
   // next();
 };
 
-const createUser = (req, res, next) => {
+const createUser = (req, res) => {
   const { name, avatar } = req.body;
-  console.log(name);
-  console.log(avatar);
 
   Users.create({ name, avatar })
     // .orFail()
@@ -81,15 +74,15 @@ const createUser = (req, res, next) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (createUser)", err });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "NotFound") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (createUser)", err });
-      } else {
-        return res
-          .status(DEFAULT)
-          .send({ message: "Server error (createUser)", err });
       }
+      return res
+        .status(DEFAULT)
+        .send({ message: "Server error (createUser)", err });
     });
   // next();
 };

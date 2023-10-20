@@ -12,7 +12,7 @@ module.exports = {
       },
       files: [".eslintrc.{js,cjs}"],
       rules: {
-        "no-underscore-dangle": ["error", { allow: ["_id"] }],
+        "no-underscore-dangle": "off",
       },
       parserOptions: {
         sourceType: "script",

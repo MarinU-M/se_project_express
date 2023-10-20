@@ -6,10 +6,8 @@ const {
   // errorHandler,
 } = require("../utils/error");
 
-const createItem = (req, res, next) => {
+const createItem = (req, res) => {
   const owner = req.user._id;
-  console.log(owner);
-
   const { name, weather, imageUrl, likes } = req.body;
 
   ClothingItems.create({
@@ -21,7 +19,6 @@ const createItem = (req, res, next) => {
   })
     // .orFail()
     .then((item) => {
-      console.log(item);
       res.status(201).send({ data: item });
     })
     .catch((err) => {
@@ -30,15 +27,15 @@ const createItem = (req, res, next) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (createItem)", err });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "NotFound") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (createItem)", err });
-      } else {
-        return res
-          .status(DEFAULT)
-          .send({ message: "Server error (createItem)", err });
       }
+      return res
+        .status(DEFAULT)
+        .send({ message: "Server error (createItem)", err });
     });
   // next();
 };
@@ -53,50 +50,46 @@ const getItems = (req, res) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (getItems)", err });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "NotFound") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (getItems)", err });
-      } else {
-        return res
-          .status(DEFAULT)
-          .send({ message: "Server error (getItems)", err });
       }
+      return res
+        .status(DEFAULT)
+        .send({ message: "Server error (getItems)", err });
     });
 };
 
 const deleteItem = (req, res) => {
-  const userId = req.user._id;
+  // const userId = req.user._id;
   const { itemId } = req.params;
-  console.log(userId);
-  console.log(itemId);
 
   ClothingItems.findByIdAndDelete(itemId)
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "ValidationError") {
+      if (err.name === "ValidationError" || err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (deleteItem)", err });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (deleteItem)", err });
-      } else {
-        return res
-          .status(DEFAULT)
-          .send({ message: "Server error (deleteItem)", err });
       }
+      return res
+        .status(DEFAULT)
+        .send({ message: "Server error (deleteItem)", err });
     });
 };
 
 const addLikes = (req, res) => {
   const userId = req.user._id;
-  const itemId = req.params._id;
-  console.log(userId);
-  console.log(itemId);
+  const { itemId } = req.params;
 
   ClothingItems.findByIdAndUpdate(
     itemId,
@@ -105,31 +98,29 @@ const addLikes = (req, res) => {
     },
     { new: true },
   )
-    // .orFail()
+    .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "ValidationError") {
+      if (err.name === "ValidationError" || err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (addLikes)", err });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (addLikes)", err });
-      } else {
-        return res
-          .status(DEFAULT)
-          .send({ message: "Server error (addLikes)", err });
       }
+      return res
+        .status(DEFAULT)
+        .send({ message: "Server error (addLikes)", err });
     });
 };
 
 const removeLikes = (req, res) => {
   const userId = req.user._id;
   const { itemId } = req.params;
-  console.log(userId);
-  console.log(itemId);
 
   ClothingItems.findByIdAndUpdate(
     itemId,
@@ -142,19 +133,19 @@ const removeLikes = (req, res) => {
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "ValidationError") {
+      if (err.name === "ValidationError" || err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (removeLikes)", err });
-      } else if (err.name === "NotFound") {
+      }
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (removeLikes)", err });
-      } else {
-        return res
-          .status(DEFAULT)
-          .send({ message: "Server error (removeLikes)", err });
       }
+      return res
+        .status(DEFAULT)
+        .send({ message: "Server error (removeLikes)", err });
     });
 };
 
