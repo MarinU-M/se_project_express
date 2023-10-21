@@ -8,27 +8,22 @@ const {
 
 const getUsers = (req, res) => {
   Users.find({})
-    .orFail()
     .then((users) => res.status(200).send(users))
     .catch((err) => {
       console.error(err);
-      //   errorHandler(err);
-      // },
+
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST)
-          .send({ message: "Invalid request (getUsers)", err });
-      }
-      if (err.name === "NotFound") {
+          .send({ message: "Invalid request (getUsers)" });
+      } if (err.name === "NotFound") {
         return res
           .status(NOT_FOUND)
-          .send({ message: "Requested info is not found (getUsers)", err });
-      }
-      return res
-        .status(DEFAULT)
-        .send({ message: "Server error (getUsers)", err });
+          .send({ message: "Requested info is not found (getUsers)" });
+      } 
+        return res.status(DEFAULT).send({ message: "Server error (getUsers)" });
+      
     });
-  // next();
 };
 
 const getAUser = (req, res) => {
@@ -36,33 +31,27 @@ const getAUser = (req, res) => {
 
   Users.findById(userId)
     .orFail()
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       console.error(err);
-      //   errorHandler(err);
-      // },
       if (err.name === "ValidationError" || err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
-          .send({ message: "Invalid request (getAUser)", err });
-      }
-      if (err.name === "DocumentNotFoundError") {
+          .send({ message: "Invalid request (getAUser)" });
+      } if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND)
-          .send({ message: "Requested info is not found (getAUser)", err });
-      }
-      return res
-        .status(DEFAULT)
-        .send({ message: "Server error (getAUser)", err });
+          .send({ message: "Requested info is not found (getAUser)" });
+      } 
+        return res.status(DEFAULT).send({ message: "Server error (getAUser)" });
+      
     });
-  // next();
 };
 
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
 
   Users.create({ name, avatar })
-    // .orFail()
     .then((user) => {
       console.log(user);
       res.status(201).send({ data: user });
@@ -73,18 +62,13 @@ const createUser = (req, res) => {
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST)
-          .send({ message: "Invalid request (createUser)", err });
-      }
-      if (err.name === "NotFound") {
+          .send({ message: "Invalid request (createUser)" });
+      } 
         return res
-          .status(NOT_FOUND)
-          .send({ message: "Requested info is not found (createUser)", err });
-      }
-      return res
-        .status(DEFAULT)
-        .send({ message: "Server error (createUser)", err });
+          .status(DEFAULT)
+          .send({ message: "Server error (createUser)" });
+      
     });
-  // next();
 };
 
 module.exports = { getUsers, getAUser, createUser };

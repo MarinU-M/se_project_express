@@ -12,7 +12,7 @@ module.exports = {
       },
       files: [".eslintrc.{js,cjs}"],
       rules: {
-        "no-underscore-dangle": "off",
+        // "no-underscore-dangle": ["error", { allow: ["_id"] }],
       },
       parserOptions: {
         sourceType: "script",
@@ -22,5 +22,5 @@ module.exports = {
   parserOptions: {
     ecmaVersion: "latest",
   },
-  rules: {},
+  rules: { "no-underscore-dangle": ["error", { allow: ["_id"] }] },
 };
