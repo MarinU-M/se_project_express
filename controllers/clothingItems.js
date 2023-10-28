@@ -42,7 +42,8 @@ const getItems = (req, res) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (getItems)" });
-      } if (err.name === "NotFound") {
+      }
+      if (err.name === "NotFound") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (getItems)" });
@@ -66,7 +67,8 @@ const deleteItem = (req, res) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (deleteItem)" });
-      } if (err.name === "DocumentNotFoundError") {
+      }
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (deleteItem)" });
@@ -94,7 +96,8 @@ const addLikes = (req, res) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (addLikes)" });
-      } if (err.name === "DocumentNotFoundError") {
+      }
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (addLikes)" });
@@ -122,7 +125,8 @@ const removeLikes = (req, res) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (removeLikes)" });
-      } if (err.name === "DocumentNotFoundError") {
+      }
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND)
           .send({ message: "Requested info is not found (removeLikes)" });
