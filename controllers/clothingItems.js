@@ -3,6 +3,7 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   DEFAULT,
+  FORBIDDEN,
   // errorHandler,
 } = require("../utils/error");
 
@@ -56,17 +57,32 @@ const getItems = (req, res) => {
 
 const deleteItem = (req, res) => {
   // const userId = req.user._id;
-  const { itemId } = req.params;
+  const { itemId, userId } = req.params;
 
   ClothingItems.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => res.status(200).send({ data: item }))
+    .then((item) => {
+      if (userId === item.owner) {
+        return res.status(200).send({ data: item });
+      } else {
+        const ForbiddenError = new Error({
+          message: "This item is owned by other user.",
+        });
+        ForbiddenError.name = "ForbiddenError";
+        throw ForbiddenError;
+      }
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (deleteItem)" });
+      }
+      if (err.name === "ForbiddenError") {
+        return res
+          .status(FORBIDDEN)
+          .send({ message: "Forbidden request (deleteItem)" });
       }
       if (err.name === "DocumentNotFoundError") {
         return res

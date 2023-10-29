@@ -4,9 +4,11 @@ const { PORT = 3001, BASE_PATH } = process.env;
 const app = express();
 const routes = require("./routes/index");
 const { createUser, login } = require("./controllers/users");
+const cors = require("cors");
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 
+// app.use(cors());
 app.use(express.json());
 
 // routes that doesnt require auth

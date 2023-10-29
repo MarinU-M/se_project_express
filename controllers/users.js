@@ -66,7 +66,8 @@ const createUser = (req, res) => {
 const login = (req, res) => {
   const { email, password } = req.body;
 
-  Users.findUserByCredentials(email, password)
+  Users.findUserByCredentials({ email })
+    .select("+password")
     .then((user) => {
       if (!user) {
         const ConflictError = new Error({
@@ -82,12 +83,51 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
+      if (err.name === "ValidationError" || err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid request (login)" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Requested info is not found (login)" });
+      }
+      return res.status(DEFAULT).send({ message: "Server error (login)" });
     });
 };
 
-const updateUser = (req, res) => {};
+const updateUser = (req, res) => {
+  const { name, avatar } = req.body;
+  const { userId } = req.params;
 
-module.exports = { getCurrentUser, createUser, login };
+  Users.findByIdAndUpdate(
+    { userId },
+    { name, avatar },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .orFail()
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "ValidationError" || err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid request (updateUser)" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Requested info is not found (updateUser)" });
+      }
+      return res.status(DEFAULT).send({ message: "Server error (updateUser)" });
+    });
+};
+
+module.exports = { getCurrentUser, createUser, login, updateUser };
 
 // no longer use
 
