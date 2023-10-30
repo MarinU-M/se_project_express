@@ -35,32 +35,39 @@ const getCurrentUser = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  Users.findOne({ email }, next).then((email) => {
-    if (email) {
+  Users.findOne(
+    { email },
+    {
+      new: true,
+      runValidators: true,
+    },
+  ).then((user) => {
+    if (user) {
       const ConflictError = new Error({
         message: "A user with this email already exists.",
       });
       ConflictError.name = "ConflictError";
       throw ConflictError;
     }
-    next();
-  });
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => Users.create({ name, avatar, email, password: hash }))
-    .then((user) => {
-      res.status(201).send({ data: user });
-    })
-    .catch((err) => {
-      console.error(err);
-      // errorHandler(err);
-      if (err.name === "ValidationError" || err.name === "ConflictError") {
+    return bcrypt
+      .hash(password, 10)
+      .then((hash) => Users.create({ name, avatar, email, password: hash }))
+      .then((user) => {
+        res.status(201).send({ data: user });
+      })
+      .catch((err) => {
+        console.error(err);
+        // errorHandler(err);
+        if (err.name === "ValidationError" || err.name === "ConflictError") {
+          return res
+            .status(BAD_REQUEST)
+            .send({ message: "Invalid request (createUser)" });
+        }
         return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid request (createUser)" });
-      }
-      return res.status(DEFAULT).send({ message: "Server error (createUser)" });
-    });
+          .status(DEFAULT)
+          .send({ message: "Server error (createUser)" });
+      });
+  });
 };
 
 const login = (req, res) => {
