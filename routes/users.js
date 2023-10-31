@@ -6,7 +6,7 @@ const { getCurrentUser, updateUser } = require("../controllers/users");
 // get the current logged in user
 router.get("/me", auth, getCurrentUser);
 
-//modify user data
+// modify user data
 router.patch("/me", auth, updateUser);
 
 // get all users

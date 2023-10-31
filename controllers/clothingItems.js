@@ -66,11 +66,10 @@ const deleteItem = (req, res) => {
         return res
           .status(FORBIDDEN)
           .send({ message: "The item is owned by other user" });
-      } else {
-        return item
-          .deleteOne()
-          .then(() => res.status(200).send({ message: "The item deleted" }));
       }
+      return item
+        .deleteOne()
+        .then(() => res.status(200).send({ message: "The item deleted" }));
     })
     .catch((err) => {
       console.error(err);

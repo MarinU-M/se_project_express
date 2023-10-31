@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const Users = require("../models/users");
 const {
   BAD_REQUEST,
@@ -6,8 +8,6 @@ const {
   CONFLICT,
   // errorHandler,
 } = require("../utils/error");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 
 const getCurrentUser = (req, res) => {
@@ -43,7 +43,7 @@ const createUser = (req, res) => {
       .send({ message: "Invalid request (createUser)" });
   }
 
-  Users.findOne({ email }).then((user) => {
+  return Users.findOne({ email }).then((user) => {
     if (user) {
       return res
         .status(CONFLICT)
