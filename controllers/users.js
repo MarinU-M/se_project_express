@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 
 const getCurrentUser = (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user._id;
 
   Users.findById(userId)
     .orFail()
@@ -78,7 +78,6 @@ const login = (req, res) => {
   const { email, password } = req.body;
 
   Users.findUserByCredentials(email, password)
-    // .select("+password")
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
@@ -103,10 +102,10 @@ const login = (req, res) => {
 
 const updateUser = (req, res) => {
   const { name, avatar } = req.body;
-  const { userId } = req.params;
+  const userId = req.user._id;
 
   Users.findByIdAndUpdate(
-    { userId },
+    userId,
     { name, avatar },
     {
       new: true,

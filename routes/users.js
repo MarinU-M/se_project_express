@@ -1,12 +1,13 @@
 const router = require("express").Router();
+const { auth } = require("../middlewares/auth");
 
 const { getCurrentUser, updateUser } = require("../controllers/users");
 
 // get the current logged in user
-router.get("/me", getCurrentUser);
+router.get("/me", auth, getCurrentUser);
 
 //modify user data
-router.patch("/me", updateUser);
+router.patch("/me", auth, updateUser);
 
 // get all users
 // router.get("/", getUsers);

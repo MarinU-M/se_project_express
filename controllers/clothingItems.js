@@ -56,20 +56,20 @@ const getItems = (req, res) => {
 };
 
 const deleteItem = (req, res) => {
-  // const userId = req.user._id;
-  const { itemId, userId } = req.params;
+  const userId = req.user._id;
+  const { itemId } = req.params;
 
-  ClothingItems.findByIdAndDelete(itemId)
+  ClothingItems.findById(itemId)
     .orFail()
     .then((item) => {
-      if (userId === item.owner) {
-        return res.status(200).send({ data: item });
+      if (!item.owner.equals(userId)) {
+        return res
+          .status(FORBIDDEN)
+          .send({ message: "The item is owned by other user" });
       } else {
-        const ForbiddenError = new Error({
-          message: "This item is owned by other user.",
-        });
-        ForbiddenError.name = "ForbiddenError";
-        throw ForbiddenError;
+        return item
+          .deleteOne()
+          .then(() => res.status(200).send({ message: "The item deleted" }));
       }
     })
     .catch((err) => {
@@ -78,11 +78,6 @@ const deleteItem = (req, res) => {
         return res
           .status(BAD_REQUEST)
           .send({ message: "Invalid request (deleteItem)" });
-      }
-      if (err.name === "ForbiddenError") {
-        return res
-          .status(FORBIDDEN)
-          .send({ message: "Forbidden request (deleteItem)" });
       }
       if (err.name === "DocumentNotFoundError") {
         return res
