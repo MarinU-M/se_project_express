@@ -23,12 +23,3 @@ app.listen(PORT, () => {
   console.log(PORT);
   console.log(BASE_PATH);
 });
-
-// no longer use
-
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: "6530430b72b4e6caeec69301", // paste the _id of the test user created in the previous step
-//   };
-//   next();
-// });

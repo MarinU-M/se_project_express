@@ -35,23 +35,10 @@ const createItem = (req, res) => {
 
 const getItems = (req, res) => {
   ClothingItems.find({})
-
-    .then((items) => res.status(200).send(items))
+    .then((items) => res.send(items))
     .catch((err) => {
       console.error(err);
-      if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid request (getItems)" });
-      }
-      if (err.name === "NotFound") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Requested info is not found (getItems)" });
-      }
-      return res
-        .status(DEFAULT)
-        .send({ message: "Server error (getItems)", err });
+      return res.status(DEFAULT).send({ message: "Server error (getItems)" });
     });
 };
 
@@ -69,7 +56,7 @@ const deleteItem = (req, res) => {
       }
       return item
         .deleteOne()
-        .then(() => res.status(200).send({ message: "The item deleted" }));
+        .then(() => res.send({ message: "The item deleted" }));
     })
     .catch((err) => {
       console.error(err);
@@ -99,7 +86,7 @@ const addLikes = (req, res) => {
     { new: true },
   )
     .orFail()
-    .then((item) => res.status(200).send({ data: item }))
+    .then((item) => res.send({ data: item }))
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
@@ -128,7 +115,7 @@ const removeLikes = (req, res) => {
     { new: true },
   )
     .orFail()
-    .then((item) => res.status(200).send({ data: item }))
+    .then((item) => res.send({ data: item }))
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {

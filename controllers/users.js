@@ -3,10 +3,10 @@ const jwt = require("jsonwebtoken");
 const Users = require("../models/users");
 const {
   BAD_REQUEST,
+  UNAUTHORIZED,
   NOT_FOUND,
   DEFAULT,
   CONFLICT,
-  // errorHandler,
 } = require("../utils/error");
 const { JWT_SECRET } = require("../utils/config");
 
@@ -43,35 +43,38 @@ const createUser = (req, res) => {
       .send({ message: "Invalid request (createUser)" });
   }
 
-  return Users.findOne({ email }).then((user) => {
-    if (user) {
-      return res
-        .status(CONFLICT)
-        .send({ message: "The user with this email already exists" });
-    }
-    return bcrypt
-      .hash(password, 10)
-      .then((hash) => Users.create({ name, avatar, email, password: hash }))
-      .then((newUser) => {
-        res.status(201).send({
-          name: newUser.name,
-          avatar: newUser.avatar,
-          email: newUser.email,
-        });
-      })
-      .catch((err) => {
-        console.error(err);
-        // errorHandler(err);
-        if (err.name === "ValidationError") {
-          return res
-            .status(BAD_REQUEST)
-            .send({ message: "Invalid request (createUser)" });
-        }
+  return Users.findOne({ email })
+    .then((user) => {
+      if (user) {
         return res
-          .status(DEFAULT)
-          .send({ message: "Server error (createUser)" });
-      });
-  });
+          .status(CONFLICT)
+          .send({ message: "The user with this email already exists" });
+      }
+      return bcrypt
+        .hash(password, 10)
+        .then((hash) => Users.create({ name, avatar, email, password: hash }))
+        .then((newUser) => {
+          res.status(201).send({
+            name: newUser.name,
+            avatar: newUser.avatar,
+            email: newUser.email,
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+          if (err.name === "ValidationError") {
+            return res
+              .status(BAD_REQUEST)
+              .send({ message: "Invalid request (createUser)" });
+          }
+          return res
+            .status(DEFAULT)
+            .send({ message: "Server error (createUser)" });
+        });
+    })
+    .catch(() =>
+      res.status(DEFAULT).send({ message: "Server error (createUser)" }),
+    );
 };
 
 const login = (req, res) => {
@@ -86,16 +89,12 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.name === "ValidationError" || err.name === "Error") {
+      if (err.message === "Incorrect email or password") {
         return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid request (login)" });
+          .status(UNAUTHORIZED)
+          .send({ message: "Unauthorized request (login)" });
       }
-      if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Requested info is not found (login)" });
-      }
+
       return res.status(DEFAULT).send({ message: "Server error (login)" });
     });
 };
@@ -131,25 +130,3 @@ const updateUser = (req, res) => {
 };
 
 module.exports = { getCurrentUser, createUser, login, updateUser };
-
-// no longer use
-
-// const getUsers = (req, res) => {
-//   Users.find({})
-//     .then((users) => res.status(200).send(users))
-//     .catch((err) => {
-//       console.error(err);
-
-//       if (err.name === "ValidationError") {
-//         return res
-//           .status(BAD_REQUEST)
-//           .send({ message: "Invalid request (getUsers)" });
-//       }
-//       if (err.name === "NotFound") {
-//         return res
-//           .status(NOT_FOUND)
-//           .send({ message: "Requested info is not found (getUsers)" });
-//       }
-//       return res.status(DEFAULT).send({ message: "Server error (getUsers)" });
-//     });
-// };
