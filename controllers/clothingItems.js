@@ -20,7 +20,7 @@ const createItem = (req, res) => {
   })
 
     .then((item) => {
-      res.status(201).send({ data: item });
+      res.status(201).send(item);
     })
     .catch((err) => {
       console.error(err);
@@ -86,7 +86,7 @@ const addLikes = (req, res) => {
     { new: true },
   )
     .orFail()
-    .then((item) => res.send({ data: item }))
+    .then((item) => res.send(item))
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
@@ -115,7 +115,7 @@ const removeLikes = (req, res) => {
     { new: true },
   )
     .orFail()
-    .then((item) => res.send({ data: item }))
+    .then((item) => res.send(item ))
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
