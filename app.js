@@ -7,6 +7,7 @@ const app = express();
 const cors = require("cors");
 const routes = require("./routes/index");
 const { createUser, login } = require("./controllers/users");
+const { errors } = require("celebrate");
 const { handleServerError } = require("./middlewares/error-handler");
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
@@ -19,7 +20,7 @@ app.post("/signin", login);
 app.post("/signup", createUser);
 
 app.use(routes);
-
+app.use(errors());
 app.use(handleServerError);
 
 app.listen(PORT, () => {
