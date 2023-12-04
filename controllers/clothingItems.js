@@ -1,11 +1,12 @@
 const ClothingItems = require("../models/clothingItems");
 const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  DEFAULT,
-  FORBIDDEN,
-  // errorHandler,
-} = require("../utils/error");
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  handleServerError,
+} = require("../middlewares/error-handler");
 
 const createItem = (req, res) => {
   const owner = req.user._id;
@@ -22,15 +23,13 @@ const createItem = (req, res) => {
     .then((item) => {
       res.status(201).send(item);
     })
-    .catch((err) => {
+    .then((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid request (createItem)" });
+        throw new BadRequestError("Invalid request (createItem)");
       }
-      return res.status(DEFAULT).send({ message: "Server error (createItem)" });
-    });
+    })
+    .catch(next);
 };
 
 const getItems = (req, res) => {
@@ -38,7 +37,7 @@ const getItems = (req, res) => {
     .then((items) => res.send(items))
     .catch((err) => {
       console.error(err);
-      return res.status(DEFAULT).send({ message: "Server error (getItems)" });
+      next(err);
     });
 };
 
@@ -50,28 +49,22 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => {
       if (!item.owner.equals(userId)) {
-        return res
-          .status(FORBIDDEN)
-          .send({ message: "The item is owned by other user" });
+        throw new ForbiddenError("The item is owned by other user");
       }
       return item
         .deleteOne()
         .then(() => res.send({ message: "The item deleted" }));
     })
-    .catch((err) => {
+    .then((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid request (deleteItem)" });
+        throw new BadRequestError("Invalid request (deleteItem)");
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Requested info is not found (deleteItem)" });
+        throw new NotFoundError("Requested info is not found (deleteItem)");
       }
-      return res.status(DEFAULT).send({ message: "Server error (deleteItem)" });
-    });
+    })
+    .catch(next);
 };
 
 const addLikes = (req, res) => {
@@ -87,20 +80,16 @@ const addLikes = (req, res) => {
   )
     .orFail()
     .then((item) => res.send(item))
-    .catch((err) => {
+    .then((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid request (addLikes)" });
+        throw new BadRequestError("Invalid request (addLikes)");
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Requested info is not found (addLikes)" });
+        throw new NotFoundError("Requested info is not found (addLikes)");
       }
-      return res.status(DEFAULT).send({ message: "Server error (addLikes)" });
-    });
+    })
+    .catch(next);
 };
 
 const removeLikes = (req, res) => {
@@ -115,23 +104,17 @@ const removeLikes = (req, res) => {
     { new: true },
   )
     .orFail()
-    .then((item) => res.send(item ))
-    .catch((err) => {
+    .then((item) => res.send(item))
+    .then((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid request (removeLikes)" });
+        throw new BadRequestError("Invalid request (removeLikes)");
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Requested info is not found (removeLikes)" });
+        throw new NotFoundError("Requested info is not found (removeLikes)");
       }
-      return res
-        .status(DEFAULT)
-        .send({ message: "Server error (removeLikes)" });
-    });
+    })
+    .catch(next);
 };
 
 module.exports = { createItem, getItems, deleteItem, addLikes, removeLikes };

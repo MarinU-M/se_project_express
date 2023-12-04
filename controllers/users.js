@@ -2,12 +2,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Users = require("../models/users");
 const {
-  BAD_REQUEST,
-  UNAUTHORIZED,
-  NOT_FOUND,
-  DEFAULT,
-  CONFLICT,
-} = require("../utils/error");
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+  handleServerError,
+} = require("../middlewares/error-handler");
 const { JWT_SECRET } = require("../utils/config");
 
 const getCurrentUser = (req, res) => {
@@ -16,39 +17,29 @@ const getCurrentUser = (req, res) => {
   Users.findById(userId)
     .orFail()
     .then((user) => res.send(user))
-    .catch((err) => {
+    .then((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid request (getCurrentUser)" });
+        throw new BadRequestError("Invalid request (getCurrentUser)");
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Requested info is not found (getCurrentUser)" });
+        throw new NotFoundError("Requested info is not found (getCurrentUser)");
       }
-      return res
-        .status(DEFAULT)
-        .send({ message: "Server error (getCurrentUser)" });
-    });
+    })
+    .catch(next);
 };
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email || !password) {
-    return res
-      .status(BAD_REQUEST)
-      .send({ message: "Invalid request (createUser)" });
+    throw new BadRequestError("Invalid request (createUser)");
   }
 
   return Users.findOne({ email })
     .then((user) => {
       if (user) {
-        return res
-          .status(CONFLICT)
-          .send({ message: "The user with this email already exists" });
+        throw new ConflictError("The user with this email already exists");
       }
       return bcrypt
         .hash(password, 10)
@@ -60,21 +51,14 @@ const createUser = (req, res) => {
             email: newUser.email,
           });
         })
-        .catch((err) => {
+        .then((err) => {
           console.error(err);
           if (err.name === "ValidationError") {
-            return res
-              .status(BAD_REQUEST)
-              .send({ message: "Invalid request (createUser)" });
+            throw new BadRequestError("Invalid request (createUser)");
           }
-          return res
-            .status(DEFAULT)
-            .send({ message: "Server error (createUser)" });
         });
     })
-    .catch(() =>
-      res.status(DEFAULT).send({ message: "Server error (createUser)" }),
-    );
+    .catch(next);
 };
 
 const login = (req, res) => {
@@ -87,16 +71,13 @@ const login = (req, res) => {
       });
       return res.status(200).send({ token });
     })
-    .catch((err) => {
+    .then((err) => {
       console.error(err);
       if (err.message === "Incorrect email or password") {
-        return res
-          .status(UNAUTHORIZED)
-          .send({ message: "Unauthorized request (login)" });
+        throw new UnauthorizedError("Unauthorized request (login)");
       }
-
-      return res.status(DEFAULT).send({ message: "Server error (login)" });
-    });
+    })
+    .catch(next);
 };
 
 const updateUser = (req, res) => {
@@ -113,20 +94,16 @@ const updateUser = (req, res) => {
   )
     .orFail()
     .then((user) => res.send(user))
-    .catch((err) => {
+    .then((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid request (updateUser)" });
+        throw new BadRequestError("Invalid request (updateUser)");
       }
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Requested info is not found (updateUser)" });
+        throw new NotFoundError("Requested info is not found (updateUser)");
       }
-      return res.status(DEFAULT).send({ message: "Server error (updateUser)" });
-    });
+    })
+    .catch(next);
 };
 
 module.exports = { getCurrentUser, createUser, login, updateUser };
