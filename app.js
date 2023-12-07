@@ -2,12 +2,12 @@ const express = require("express");
 
 const mongoose = require("mongoose");
 
-const { PORT = 3001, BASE_PATH } = process.env;
+const { PORT = 3001 } = process.env;
 const app = express();
 const cors = require("cors");
+const { errors } = require("celebrate");
 const routes = require("./routes/index");
 const { createUser, login } = require("./controllers/users");
-const { errors } = require("celebrate");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 const { handleServerError } = require("./middlewares/error-handler");
 
@@ -26,6 +26,4 @@ app.use(errorLogger);
 app.use(errors());
 app.use(handleServerError);
 
-app.listen(PORT, () => {
-  console.log(PORT);
-});
+app.listen(PORT);

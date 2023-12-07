@@ -4,14 +4,12 @@ const Users = require("../models/users");
 const {
   BadRequestError,
   UnauthorizedError,
-  ForbiddenError,
   NotFoundError,
   ConflictError,
-  handleServerError,
 } = require("../middlewares/error-handler");
 const { JWT_SECRET } = require("../utils/config");
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
 
   Users.findById(userId)
@@ -29,7 +27,7 @@ const getCurrentUser = (req, res) => {
     .catch(next);
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   if (!email || !password) {
@@ -61,7 +59,7 @@ const createUser = (req, res) => {
     .catch(next);
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   Users.findUserByCredentials(email, password)
@@ -80,7 +78,7 @@ const login = (req, res) => {
     .catch(next);
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   const { name, avatar } = req.body;
   const userId = req.user._id;
 

@@ -1,14 +1,11 @@
 const ClothingItems = require("../models/clothingItems");
 const {
   BadRequestError,
-  UnauthorizedError,
   ForbiddenError,
   NotFoundError,
-  ConflictError,
-  handleServerError,
 } = require("../middlewares/error-handler");
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const owner = req.user._id;
   const { name, weather, imageUrl, likes } = req.body;
 
@@ -32,7 +29,7 @@ const createItem = (req, res) => {
     .catch(next);
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItems.find({})
     .then((items) => res.send(items))
     .catch((err) => {
@@ -41,7 +38,7 @@ const getItems = (req, res) => {
     });
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const userId = req.user._id;
   const { itemId } = req.params;
 
@@ -67,7 +64,7 @@ const deleteItem = (req, res) => {
     .catch(next);
 };
 
-const addLikes = (req, res) => {
+const addLikes = (req, res, next) => {
   const userId = req.user._id;
   const { itemId } = req.params;
 
@@ -92,7 +89,7 @@ const addLikes = (req, res) => {
     .catch(next);
 };
 
-const removeLikes = (req, res) => {
+const removeLikes = (req, res, next) => {
   const userId = req.user._id;
   const { itemId } = req.params;
 

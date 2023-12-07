@@ -11,9 +11,7 @@ module.exports = {
         node: true,
       },
       files: [".eslintrc.{js,cjs}"],
-      rules: {
-        // "no-underscore-dangle": ["error", { allow: ["_id"] }],
-      },
+      rules: {},
       parserOptions: {
         sourceType: "script",
       },
@@ -25,5 +23,6 @@ module.exports = {
   rules: {
     "no-underscore-dangle": ["error", { allow: ["_id"] }],
     "no-unused-vars": ["error", { argsIgnorePattern: "next" }],
+    "max-classes-per-file": ["error", 5],
   },
 };
