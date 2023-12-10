@@ -6,7 +6,8 @@ A user can check weather appropriate outfit using this app.
 
 Authorization/authentication function is implemented using jsonwebtoken. Now, a user can login to the app and their data would be protected from other users' accesses. Email address and password is required in order to make brand new account.
 
-In future, this backend will be connected to the [frontend](https://github.com/MarinU-M/se_project_react).
+This backend is connected to the [frontend](https://github.com/MarinU-M/se_project_react).
+The deployed site is [here](https://wtwrbymum.crabdance.com/)
 
 ## Tools and Technologies
 
