@@ -1,9 +1,7 @@
 const ClothingItems = require("../models/clothingItems");
-const {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} = require("../middlewares/error-handler");
+const { BadRequestError } = require("../middlewares/BadRequestError");
+const { ForbiddenError } = require("../middlewares/ForbiddenError");
+const { NotFoundError } = require("../middlewares/NotFoundError");
 
 const createItem = (req, res, next) => {
   const owner = req.user._id;
@@ -20,13 +18,14 @@ const createItem = (req, res, next) => {
     .then((item) => {
       res.status(201).send(item);
     })
-    .then((err) => {
+    .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        throw new BadRequestError("Invalid request (createItem)");
+        next(new BadRequestError("Invalid request (createItem)"));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 const getItems = (req, res, next) => {
@@ -52,16 +51,16 @@ const deleteItem = (req, res, next) => {
         .deleteOne()
         .then(() => res.send({ message: "The item deleted" }));
     })
-    .then((err) => {
+    .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
-        throw new BadRequestError("Invalid request (deleteItem)");
+        next(new BadRequestError("Invalid request (deleteItem)"));
+      } else if (err.name === "DocumentNotFoundError") {
+        next(new NotFoundError("Requested info is not found (deleteItem)"));
+      } else {
+        next(err);
       }
-      if (err.name === "DocumentNotFoundError") {
-        throw new NotFoundError("Requested info is not found (deleteItem)");
-      }
-    })
-    .catch(next);
+    });
 };
 
 const addLikes = (req, res, next) => {
@@ -77,16 +76,16 @@ const addLikes = (req, res, next) => {
   )
     .orFail()
     .then((item) => res.send(item))
-    .then((err) => {
+    .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
-        throw new BadRequestError("Invalid request (addLikes)");
+        next(new BadRequestError("Invalid request (addLikes)"));
+      } else if (err.name === "DocumentNotFoundError") {
+        next(new NotFoundError("Requested info is not found (addLikes)"));
+      } else {
+        next(err);
       }
-      if (err.name === "DocumentNotFoundError") {
-        throw new NotFoundError("Requested info is not found (addLikes)");
-      }
-    })
-    .catch(next);
+    });
 };
 
 const removeLikes = (req, res, next) => {
@@ -102,16 +101,16 @@ const removeLikes = (req, res, next) => {
   )
     .orFail()
     .then((item) => res.send(item))
-    .then((err) => {
+    .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
-        throw new BadRequestError("Invalid request (removeLikes)");
+        next(new BadRequestError("Invalid request (removeLikes)"));
+      } else if (err.name === "DocumentNotFoundError") {
+        next(new NotFoundError("Requested info is not found (removeLikes)"));
+      } else {
+        next(err);
       }
-      if (err.name === "DocumentNotFoundError") {
-        throw new NotFoundError("Requested info is not found (removeLikes)");
-      }
-    })
-    .catch(next);
+    });
 };
 
 module.exports = { createItem, getItems, deleteItem, addLikes, removeLikes };

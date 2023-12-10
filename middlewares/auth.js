@@ -1,4 +1,4 @@
-const { JWT_SECRET } = process.env;
+NODE_ENV === "production" ? JWT_SECRET : "dev-secret";
 
 const jwt = require("jsonwebtoken");
 const { UnauthorizedError } = require("./error-handler");

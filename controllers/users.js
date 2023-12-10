@@ -3,12 +3,10 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Users = require("../models/users");
-const {
-  BadRequestError,
-  UnauthorizedError,
-  NotFoundError,
-  ConflictError,
-} = require("../middlewares/error-handler");
+const { UnauthorizedError } = require("../middlewares/UnauthorizedError");
+const { ConflictError } = require("../middlewares/ConflictError");
+const { BadRequestError } = require("../middlewares/BadRequestError");
+const { NotFoundError } = require("../middlewares/NotFoundError");
 
 const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
@@ -16,16 +14,16 @@ const getCurrentUser = (req, res, next) => {
   Users.findById(userId)
     .orFail()
     .then((user) => res.send(user))
-    .then((err) => {
+    .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
-        throw new BadRequestError("Invalid request (getCurrentUser)");
+        next(new BadRequestError("Invalid request (getCurrentUser)"));
+      } else if (err.name === "DocumentNotFoundError") {
+        next(new NotFoundError("Requested info is not found (getCurrentUser)"));
+      } else {
+        next(err);
       }
-      if (err.name === "DocumentNotFoundError") {
-        throw new NotFoundError("Requested info is not found (getCurrentUser)");
-      }
-    })
-    .catch(next);
+    });
 };
 
 const createUser = (req, res, next) => {
@@ -49,15 +47,16 @@ const createUser = (req, res, next) => {
             avatar: newUser.avatar,
             email: newUser.email,
           });
-        })
-        .then((err) => {
-          console.error(err);
-          if (err.name === "ValidationError") {
-            throw new BadRequestError("Invalid request (createUser)");
-          }
         });
     })
-    .catch(next);
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "ValidationError") {
+        next(new BadRequestError("Invalid request (createUser)"));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const login = (req, res, next) => {
@@ -74,13 +73,14 @@ const login = (req, res, next) => {
       );
       return res.status(200).send({ token });
     })
-    .then((err) => {
+    .catch((err) => {
       console.error(err);
       if (err.message === "Incorrect email or password") {
-        throw new UnauthorizedError("Unauthorized request (login)");
+        next(new UnauthorizedError("Unauthorized request (login)"));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 const updateUser = (req, res, next) => {
@@ -97,16 +97,16 @@ const updateUser = (req, res, next) => {
   )
     .orFail()
     .then((user) => res.send(user))
-    .then((err) => {
+    .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError" || err.name === "CastError") {
-        throw new BadRequestError("Invalid request (updateUser)");
+        next(new BadRequestError("Invalid request (updateUser)"));
+      } else if (err.name === "DocumentNotFoundError") {
+        next(new NotFoundError("Requested info is not found (updateUser)"));
+      } else {
+        next(err);
       }
-      if (err.name === "DocumentNotFoundError") {
-        throw new NotFoundError("Requested info is not found (updateUser)");
-      }
-    })
-    .catch(next);
+    });
 };
 
 module.exports = { getCurrentUser, createUser, login, updateUser };
