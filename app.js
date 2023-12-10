@@ -18,6 +18,12 @@ mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 app.use(cors());
 app.use(express.json());
 
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
+
 // routes that doesnt require auth
 app.post("/signin", login);
 app.post("/signup", createUser);
