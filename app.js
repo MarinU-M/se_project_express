@@ -8,8 +8,10 @@ const { PORT = 3001 } = process.env;
 const app = express();
 const cors = require("cors");
 const { errors } = require("celebrate");
-const routes = require("./routes/index");
 const { rateLimit } = require("express-rate-limit");
+const helmet = require("helmet");
+
+const routes = require("./routes/index");
 
 const { createUser, login } = require("./controllers/users");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
@@ -18,7 +20,6 @@ const {
   validateUserInfo,
   validateLoginUser,
 } = require("./middlewares/validation");
-const helmet = require("helmet");
 
 mongoose.connect("mongodb://127.0.0.1:27017/wtwr_db");
 app.use(express.json());
